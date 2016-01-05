@@ -16,18 +16,9 @@ var limit int
 
 
 func main() {
-	flagSet := flag.NewFlagSet(os.Args[0],flag.ExitOnError)
-
-
-	flagSet.StringVar(&outputPath, "o", "", "出力先")
-
-	flagSet.Parse(os.Args[3:])
 	flag.Parse()
 	verb = flag.Arg(0)
 	fmt.Printf("verb=%s\n", verb)
-	for i := 0; i != flag.NArg(); i++ {
-		fmt.Printf("arg[%d]=%s\n", i, flag.Arg(i))
-	}
 
 	switch verb{
 	case "create":
@@ -171,13 +162,12 @@ func Update() {
 
 func List() {
 	flagSet := flag.NewFlagSet(os.Args[0],flag.ExitOnError)
-	flagSet.IntVar(&limit, "limit", 10, "最大取得数")
+	flagSet.IntVar(&limit, "limit", 0, "最大取得数")
 	flagSet.Parse(os.Args[3:])
 	path = flag.Arg(1)
 	limitStr := ""
 	if limit > 0{
-		fmt.Printf("~~~~~~~~~~%d\n", limit)
-		limitStr = "?limit=" + string(limit)
+		limitStr = "?limit=" + fmt.Sprintf("%d",  limit)
 	}
 	resp, err := http.Get(host + path + limitStr)
 	if err != nil {
