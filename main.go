@@ -18,7 +18,6 @@ var limit int
 func main() {
 	flag.Parse()
 	verb = flag.Arg(0)
-	fmt.Printf("verb=%s\n", verb)
 
 	switch verb{
 	case "create":
