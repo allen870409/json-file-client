@@ -144,7 +144,7 @@ func Update() {
 	}
 	body := bytes.NewBuffer([]byte(jsonString))
 
-	res,err := http.Post("http://127.0.0.1:9000" + path, "application/json;charset=utf-8", body)
+	res,err := http.Post(host + path, "application/json;charset=utf-8", body)
 
 	if err != nil {
 		log.Fatal(err)
