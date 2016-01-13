@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"log"
 	"os"
+	"encoding/json"
 )
 
 var host = "http://127.0.0.1:9000"
@@ -34,6 +35,16 @@ func main() {
 		fmt.Fprintln(os.Stdout, "wrong verb!!!")
 		return
 	}
+}
+
+type ResponseJson struct{
+	Status int
+	Data interface{}
+}
+
+type ResponseJsonList struct{
+	Status int
+	Data []string
 }
 
 
@@ -74,7 +85,7 @@ func Create() {
 		log.Fatal(err)
 		return
 	}
-	fmt.Printf("%s", result)
+	readJsonResponse(result)
 }
 
 func Get() {
@@ -91,6 +102,7 @@ func Get() {
 		}
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
+		fmt.Printf("%s\n", resp.Status)
 		fmt.Printf("%s\n", body)
 	}else{
 		path = flag.Arg(2)
@@ -127,7 +139,7 @@ func Delete() {
 		log.Fatal(err)
 		return
 	}
-	fmt.Printf("%s", result)
+	readJsonResponse(result)
 }
 
 func Update() {
@@ -156,7 +168,7 @@ func Update() {
 		log.Fatal(err)
 		return
 	}
-	fmt.Printf("%s", result)
+	readJsonResponse(result)
 }
 
 func List() {
@@ -175,11 +187,29 @@ func List() {
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	fmt.Printf("%s\n", body)
+	jsonBody := ResponseJsonList{}
+	if err := json.Unmarshal(body, &jsonBody); err != nil {
+		logError(err)
+	}else {
+		fmt.Printf("%s\n", http.StatusText(jsonBody.Status))
+		for _, v := range jsonBody.Data{
+			fmt.Printf("%s\n", v)
+		}
+	}
 }
 
 func logError(err error) {
 	fmt.Fprintln(os.Stderr, err)
+}
+
+func readJsonResponse(body []byte) {
+	jsonBody := ResponseJson{}
+	if err := json.Unmarshal(body, &jsonBody); err != nil {
+		logError(err)
+	}else {
+		fmt.Printf("%s\t", http.StatusText(jsonBody.Status))
+		fmt.Printf("%s\n", jsonBody.Data)
+	}
 }
 
 
